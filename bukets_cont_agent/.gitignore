@@ -1,0 +1,20 @@
+# SDLC Agent Framework — .gitignore
+# Este archivo evita que proyectos generados y documentación
+# de trabajo se mezclen con el repositorio del framework
+
+# Proyectos generados por new-project.sh (se copian, no se desarrollan aquí)
+projects/
+
+# Documentación de entrega generada (pertenece al proyecto, no al framework)
+docs/delivery/
+
+# Documentación de sprints generada (pertenece al proyecto, no al framework)
+docs/sprints/
+
+# Reportes de avance generados (pertenecen al proyecto, no al framework)
+docs/progress/
+
+# Archivos temporales del sistema
+*.log
+.DS_Store
+Thumbs.db

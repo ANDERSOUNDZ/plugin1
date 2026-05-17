@@ -1,0 +1,92 @@
+# Configuración del SDLC Agent Framework
+# Modifica estos valores para ajustar el comportamiento del agente
+
+framework:
+  version: "2.0"
+  language: "es"  # Idioma del agente (es / en)
+  agnostic_llm: true  # Compatible con cualquier LLM
+
+# Umbrales de calidad — el agente bloquea el avance si no se cumplen
+quality:
+  test_coverage_minimum: 70        # % mínimo de cobertura de pruebas
+  critical_bugs_allowed: 0         # Bugs críticos permitidos antes de deploy
+  max_function_lines: 20           # Líneas máximas por función (guía)
+  max_nesting_depth: 3             # Niveles de anidamiento máximos
+  max_function_params: 4           # Parámetros máximos por función
+  ci_build_max_minutes: 10         # Tiempo máximo de build en CI/CD
+  uptime_target_percent: 99.5      # Uptime objetivo en producción
+
+# Fases activas — puedes deshabilitar fases si el proyecto no las necesita
+phases:
+  phase_0_interview: true          # Entrevista inicial (recomendado: siempre true)
+  phase_1_requirements: true       # Requerimientos
+  phase_2_design: true             # Diseño y arquitectura
+  phase_3_development: true        # Desarrollo
+  phase_4_testing: true            # QA
+  phase_5_deployment: true         # Despliegue
+  phase_6_maintenance: true        # Mantenimiento
+  phase_7_delivery: true           # Documentación de entrega (compila y valida docs para el cliente)
+
+# Comportamiento del bucle de calidad
+quality_loop:
+  blocking: true                   # true = bloquea el avance si el bucle está abierto
+  auto_checklist: true             # Muestra checklist automáticamente al cerrar fase
+  require_adr_for_decisions: true  # Requiere ADR para cada decisión importante
+  learn_from_errors: true          # Registra errores aprendidos automáticamente
+  require_docs_sync: true          # true = bloquea el avance si los docs de entrega están desincronizados
+
+# Memoria y aprendizaje
+memory:
+  track_decisions: true            # Registra todas las decisiones
+  track_errors: true               # Registra errores y cómo se resolvieron
+  track_patterns: true             # Registra patrones útiles descubiertos
+  session_summary: true            # Genera resumen al final de cada sesión
+
+# Revisión de código
+code_review:
+  require_review_before_merge: true
+  min_reviewers: 1
+  block_on_critical: true          # Bloquea merge si hay issues críticos
+  block_on_high: true              # Bloquea merge si hay issues altos
+
+# Documentación de entrega
+delivery_docs:
+  auto_generate: true              # Genera automáticamente docs al cerrar cada fase
+  generate_per_phase: true         # Genera incrementalmente durante todas las fases
+  validate_before_delivery: true   # Valida calidad antes de considerar completa la Fase 7
+  require_client_approval: true    # Requiere aprobación del cliente antes de cerrar Fase 7
+  output_dir: "docs/delivery"      # Directorio donde se almacenan los docs de entrega
+  documents:
+    technical_architecture: true   # Documento de Arquitectura Técnica
+    user_manual: true              # Manual de Usuario
+    api_reference: true            # API Reference
+    deployment_guide: true         # Guía de Despliegue
+    operations_guide: true         # Guía de Operaciones
+    release_notes: true            # Release Notes
+    admin_guide: true              # Guía de Administración
+    security_compliance: true      # Seguridad y Compliance
+
+# Comunicación del agente
+communication:
+  show_reasoning: true             # Explica el razonamiento detrás de cada decisión
+  proactive_suggestions: true      # Sugiere mejoras sin que se las pidan
+  use_checklists: true             # Usa checklists visuales en las respuestas
+  phase_status_in_responses: true  # Muestra la fase actual en cada respuesta
+
+# Tipos de proyecto soportados
+project_types:
+  - web_app
+  - mobile_app
+  - api_service
+  - cli_tool
+  - library
+  - data_pipeline
+  - microservice
+  - monolith
+
+# Modelos SDLC soportados
+sdlc_models:
+  - scrum                          # Sprints de 1-4 semanas
+  - kanban                         # Flujo continuo
+  - devops                         # CI/CD desde el día 1
+  - lean_startup                   # MVP + validación rápida
