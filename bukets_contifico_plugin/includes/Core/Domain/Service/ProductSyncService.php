@@ -72,9 +72,9 @@ final class ProductSyncService
         $product   = $this->mapContificoProductToDomain($prodData);
         $existing  = $this->productRepo->findBySku($sku);
         if ($existing !== null) {
-            $wcProductId = wc_get_product_id_by_sku($sku);
-            if ($wcProductId) {
-                $this->productRepo->updateProductData((int) $wcProductId, $product);
+            $wcProductId = $this->productRepo->getWcProductIdBySku($sku);
+            if ($wcProductId !== null) {
+                $this->productRepo->updateProductData($wcProductId, $product);
                 $result['updated']++;
             }
         } else {

@@ -11,4 +11,6 @@ interface ProductRepositoryPort
     public function findOrCreateBySku(Product $product): int;
     public function updateStock(int $wcProductId, float $stock): bool;
     public function updateProductData(int $wcProductId, Product $product): bool;
+    public function getWcProductIdBySku(string $sku): ?int;
+    public function getCurrentStock(int $wcProductId): ?float;
 }

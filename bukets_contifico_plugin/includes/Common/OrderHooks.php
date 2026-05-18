@@ -70,28 +70,8 @@ final class OrderHooks
             return;
         }
 
-        $customer = new Customer(
-            '',
-            $wcOrder->get_billing_first_name() . ' ' . $wcOrder->get_billing_last_name(),
-            strlen($cedula) === 13 ? 'J' : 'N',
-            new Cedula($cedula),
-            null,
-            $wcOrder->get_billing_email(),
-            $wcOrder->get_billing_phone(),
-            $wcOrder->get_billing_address_1()
-        );
-
-        $items = array();
-        foreach ($wcOrder->get_items() as $item) {
-            $product = $item->get_product();
-            $items[] = array(
-                'sku'                  => $product ? $product->get_sku() : '',
-                'contifico_product_id' => $product ? $product->get_meta('contifico_product_id') : '',
-                'nombre'               => $item->get_name(),
-                'cantidad'             => $item->get_quantity(),
-                'precio'               => $item->get_total() / max(1, $item->get_quantity()),
-            );
-        }
+        $customer = OrderRepository::customerFromWcOrder($wcOrder);
+        $items    = OrderRepository::itemsFromWcOrder($wcOrder);
 
         $shippingTotal = Money::fromFloat((float) $wcOrder->get_shipping_total());
         $paymentMethod = $wcOrder->get_payment_method();

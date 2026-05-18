@@ -81,17 +81,16 @@ final class InventorySyncService
                 break;
             }
         }
-        $wcProductId = wc_get_product_id_by_sku($sku);
-        if (!$wcProductId) {
+        $wcProductId = $this->productRepo->getWcProductIdBySku($sku);
+        if ($wcProductId === null) {
             return;
         }
-        $wcProduct = wc_get_product($wcProductId);
-        if (!$wcProduct) {
+        $currentStock = $this->productRepo->getCurrentStock($wcProductId);
+        if ($currentStock === null) {
             return;
         }
-        $currentStock = (float) $wcProduct->get_stock_quantity();
         if (abs($stockEnBodega - $currentStock) > 0.001) {
-            $this->productRepo->updateStock((int) $wcProductId, $stockEnBodega);
+            $this->productRepo->updateStock($wcProductId, $stockEnBodega);
             $result['updated']++;
         }
         $result['synced']++;

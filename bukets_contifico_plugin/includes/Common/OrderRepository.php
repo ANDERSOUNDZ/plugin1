@@ -55,10 +55,10 @@ final class OrderRepository implements OrderRepositoryPort
         return (bool) $wcOrder->get_meta('contifico_synced', false);
     }
 
-    private function buildFromWcOrder(\WC_Order $wcOrder): Order
+    public static function customerFromWcOrder(\WC_Order $wcOrder): Customer
     {
         $cedula = (string) $wcOrder->get_meta('_billing_cedula');
-        $customer = new Customer(
+        return new Customer(
             '',
             $wcOrder->get_billing_first_name() . ' ' . $wcOrder->get_billing_last_name(),
             strlen($cedula) === 13 ? 'J' : 'N',
@@ -68,6 +68,10 @@ final class OrderRepository implements OrderRepositoryPort
             $wcOrder->get_billing_phone(),
             $wcOrder->get_billing_address_1()
         );
+    }
+
+    public static function itemsFromWcOrder(\WC_Order $wcOrder): array
+    {
         $items = array();
         foreach ($wcOrder->get_items() as $item) {
             $product = $item->get_product();
@@ -79,6 +83,13 @@ final class OrderRepository implements OrderRepositoryPort
                 'precio'               => $item->get_total() / max(1, $item->get_quantity()),
             );
         }
+        return $items;
+    }
+
+    private function buildFromWcOrder(\WC_Order $wcOrder): Order
+    {
+        $customer = self::customerFromWcOrder($wcOrder);
+        $items    = self::itemsFromWcOrder($wcOrder);
         return new Order(
             $wcOrder->get_id(),
             $wcOrder->get_status(),

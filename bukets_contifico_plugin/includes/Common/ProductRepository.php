@@ -32,6 +32,21 @@ final class ProductRepository implements ProductRepositoryPort
         return $this->createWcProduct($product);
     }
 
+    public function getWcProductIdBySku(string $sku): ?int
+    {
+        $wcProductId = wc_get_product_id_by_sku($sku);
+        return $wcProductId ? (int) $wcProductId : null;
+    }
+
+    public function getCurrentStock(int $wcProductId): ?float
+    {
+        $wcProduct = wc_get_product($wcProductId);
+        if (!$wcProduct) {
+            return null;
+        }
+        return (float) $wcProduct->get_stock_quantity();
+    }
+
     public function updateStock(int $wcProductId, float $stock): bool
     {
         $wcProduct = wc_get_product($wcProductId);
@@ -51,16 +66,7 @@ final class ProductRepository implements ProductRepositoryPort
         if (!$wcProduct) {
             return false;
         }
-        $wcProduct->set_name($product->nombre());
-        $wcProduct->set_description($product->descripcion());
-        $wcProduct->set_sku($product->codigo());
-        $wcProduct->set_regular_price((string) $product->precio()->asFloat());
-        $wcProduct->set_manage_stock(true);
-        $wcProduct->set_stock_quantity((int) $product->stock());
-        $wcProduct->set_stock_status($product->stock() > 0 ? 'instock' : 'outofstock');
-        $wcProduct->update_meta_data('contifico_product_id', $product->id());
-        $wcProduct->update_meta_data('contifico_categoria_id', $product->categoriaId());
-        $wcProduct->update_meta_data('contifico_last_sync', time());
+        $this->applyProductData($wcProduct, $product);
         $wcProduct->save();
         $this->assignCategory($wcProductId, $product);
         return true;
@@ -69,6 +75,15 @@ final class ProductRepository implements ProductRepositoryPort
     private function createWcProduct(Product $product): int
     {
         $wcProduct = new \WC_Product_Simple();
+        $this->applyProductData($wcProduct, $product);
+        $wcProduct->set_catalog_visibility('visible');
+        $wcProductId = $wcProduct->save();
+        $this->assignCategory($wcProductId, $product);
+        return $wcProductId;
+    }
+
+    private function applyProductData(\WC_Product $wcProduct, Product $product): void
+    {
         $wcProduct->set_name($product->nombre());
         $wcProduct->set_description($product->descripcion());
         $wcProduct->set_sku($product->codigo());
@@ -79,10 +94,6 @@ final class ProductRepository implements ProductRepositoryPort
         $wcProduct->update_meta_data('contifico_product_id', $product->id());
         $wcProduct->update_meta_data('contifico_categoria_id', $product->categoriaId());
         $wcProduct->update_meta_data('contifico_last_sync', time());
-        $wcProduct->set_catalog_visibility('visible');
-        $wcProductId = $wcProduct->save();
-        $this->assignCategory($wcProductId, $product);
-        return $wcProductId;
     }
 
     private function assignCategory(int $wcProductId, Product $product): void
