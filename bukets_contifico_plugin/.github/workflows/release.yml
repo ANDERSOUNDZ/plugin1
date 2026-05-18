@@ -1,0 +1,63 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+      - name: PHP Lint
+        run: find includes/ -name "*.php" -exec php -l {} \;
+      - name: PHPCS
+        run: vendor/bin/phpcs --standard=phpcs.xml
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse --configuration=phpstan.neon --no-progress
+      - name: Unit tests
+        run: vendor/bin/phpunit --testsuite=unit
+      - name: Install production deps only
+        run: composer install --no-dev --optimize-autoloader
+      - name: Generate .pot file
+        run: |
+          if command -v wp &> /dev/null; then
+            wp i18n make-pot . languages/bukets-contifico.pot --slug=bukets-contifico
+          fi
+      - name: Build plugin zip
+        run: |
+          mkdir -p build/bukets-contifico-sync
+          rsync -av --exclude='.git' --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='tests' --exclude='bin' \
+            --exclude='composer.json' --exclude='composer.lock' \
+            --exclude='phpunit.xml' --exclude='phpstan.neon' \
+            --exclude='phpcs.xml' --exclude='.gitignore' \
+            --exclude='_docs-reference' \
+            ./ build/bukets-contifico-sync/
+          cd build && zip -r bukets-contifico-sync.zip bukets-contifico-sync/
+      - name: Generate changelog
+        id: changelog
+        run: |
+          echo "CHANGELOG<<EOF" >> $GITHUB_ENV
+          git log $(git describe --tags --abbrev=0 2>/dev/null || git rev-list --max-parents=0 HEAD)..HEAD --pretty=format:"- %s (%h)" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/bukets-contifico-sync.zip
+          body: |
+            ## Bukets Contifico Sync ${{ github.ref_name }}
+
+            ### Changes
+            ${{ env.CHANGELOG }}
+          draft: false
+          prerelease: false

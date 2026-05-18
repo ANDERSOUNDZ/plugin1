@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4']
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer, phpcs, phpstan
+      - name: Validate composer
+        run: composer validate --strict
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+      - name: PHP Lint
+        run: find includes/ -name "*.php" -exec php -l {} \;
+      - name: PHPCS
+        run: vendor/bin/phpcs --standard=phpcs.xml
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse --configuration=phpstan.neon --no-progress
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    needs: lint
+    strategy:
+      matrix:
+        php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4']
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: pcov
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+      - name: Unit tests
+        run: vendor/bin/phpunit --testsuite=unit --coverage-text
+
+  security:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+      - name: Composer audit
+        run: composer audit

@@ -1,0 +1,51 @@
+{
+    "name": "bukets/bukets-contifico-sync",
+    "description": "Plugin WordPress para sincronizacion bidireccional y facturacion electronica con Contifico (Ecuador SRI)",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Bukets.ec",
+            "homepage": "https://bukets.ec"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.0",
+        "squizlabs/php_codesniffer": "^3.7",
+        "wp-coding-standards/wpcs": "^3.0",
+        "phpstan/phpstan": "^1.10",
+        "phpmd/phpmd": "^2.13",
+        "php-stubs/wordpress-stubs": "^6.0",
+        "php-stubs/woocommerce-stubs": "^8.0",
+        "yoast/phpunit-polyfills": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Bukets\\Contifico\\": "includes/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Bukets\\Contifico\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "lint": "phpcs --standard=phpcs.xml includes/",
+        "lint:fix": "phpcbf --standard=phpcs.xml includes/",
+        "stan": "phpstan analyse --configuration=phpstan.neon",
+        "test": "phpunit",
+        "test:unit": "phpunit --testsuite=unit",
+        "test:integration": "phpunit --testsuite=integration",
+        "build:zip": [
+            "@php bin/build-zip.php"
+        ]
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}

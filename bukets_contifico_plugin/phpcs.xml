@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<ruleset name="Bukets Contifico">
+    <description>PHPCS rules for Bukets Contifico Sync</description>
+    <file>includes/</file>
+    <rule ref="WordPress">
+        <exclude name="WordPress.Files.FileName.NotHyphenatedLowercase"/>
+        <exclude name="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound"/>
+    </rule>
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="140"/>
+        </properties>
+    </rule>
+    <config name="minimum_supported_wp_version" value="6.0"/>
+    <config name="testVersion" value="7.4-"/>
+</ruleset>

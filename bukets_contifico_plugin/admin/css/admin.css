@@ -1,0 +1,43 @@
+.bukets-wrap {
+    max-width: 1200px;
+    margin: 20px 0;
+}
+.bukets-status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin: 20px 0;
+}
+.bukets-card {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    padding: 20px;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+}
+.bukets-card h3 {
+    margin-top: 0;
+    color: #23282d;
+}
+.bukets-card .value {
+    font-size: 28px;
+    font-weight: 600;
+    color: #0073aa;
+}
+.bukets-card .status-ok { color: #46b450; }
+.bukets-card .status-error { color: #dc3232; }
+.bukets-test-result {
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+.bukets-test-result.success {
+    background: #ecf7ed;
+    border: 1px solid #46b450;
+    color: #255a26;
+}
+.bukets-test-result.error {
+    background: #fbeaea;
+    border: 1px solid #dc3232;
+    color: #8a1f1f;
+}
